@@ -23,16 +23,17 @@ import numpy as np
 # Task 1: Given a paragraph of text, implement a simple "tokenizer" that splits the paragraph 
 #   into individual words (tokens) and removes any punctuation. Implement this using a list 
 #   comprehension.
-
+print("hello")
 # Your code here:
 # -----------------------------------------------
 text = "The quick brown fox jumps over the lazy dog!"
 
 # Write a list comprehension to tokenize the text and remove punctuation
-tokens = _ # Your code here
+tokens = [word.strip("!.,?;:'\"") for word in text.split()] # Your code here
 
 # Expected output: ['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']
 print(tokens)
+# it works 
 # -----------------------------------------------
 
 
@@ -45,9 +46,14 @@ print(tokens)
 # Your code here:
 # -----------------------------------------------
 def tokenize(string: str) -> list:
-    pass # Your code
+    tokens = [word.strip("!.,?;:'\"").lower() for word in string.split()]
+    sortedt = sorted(set(tokens))
+    return sortedt
 
-
+# Test 
+text = "The quick brown fox jumps over the lazy dog! The lazy dog!"
+result = tokenize(text)
+print(result)
 # -----------------------------------------------
 
 
@@ -74,7 +80,10 @@ def tokenize(string: str) -> list:
 
 # Your code here:
 # -----------------------------------------------
-word_frequencies = _ # Your code here
+word_frequencies = {word: 0 for word in set(tokens)}
+
+for word in tokens:
+    word_frequencies[word] += 1
 
 # Expected output example: {'the': 2, 'quick': 1, ...}
 print(word_frequencies)
@@ -90,8 +99,10 @@ print(word_frequencies)
 # Your code here:
 # -----------------------------------------------
 def token_counts(string: str, k: int = 1) -> dict:
-    pass # Your code
-
+    tokens = [word.strip("!.,?;:'\"").lower() for word in string.split()]
+    word_freq = {word: tokens.count(word) for word in set(tokens)}
+    filtered = {word: freq for word, freq in word_freq.items() if freq > k}
+    return filtered
 # test:
 text_hist = {'the': 2, 'quick': 1, 'brown': 1, 'fox': 1, 'jumps': 1, 'over': 1, 'lazy': 1, 'dog': 1}
 all(text_hist[key] == value for key, value in token_counts(text).items())
@@ -121,7 +132,7 @@ all(text_hist[key] == value for key, value in token_counts(text).items())
 
 # Your code here:
 # -----------------------------------------------
-token_to_id = _ # Your code here
+token_to_id = {word: id_code for id_code, word in enumerate(set(tokens))}
 
 # Expected output: {'dog': 0, 'quick': 1, 'fox': 2, 'the': 3, 'over': 4, 'lazy': 5, 'brown': 6, 'jumps': 7}
 print(token_to_id)
@@ -133,7 +144,7 @@ print(token_to_id)
 #
 # Your code here:
 # -----------------------------------------------
-id_to_token = _ # Your code here
+id_to_token = {id_code: word for word, id_code in token_to_id.items()} 
 
 # tests: 
 # test 1
@@ -154,8 +165,14 @@ assert all(id_to_token[token_to_id[key]]==key for key in token_to_id) and all(to
 # Your code here:
 # -----------------------------------------------
 def make_vocabulary_map(documents: list) -> tuple:
-    # Hint: use your tokenize function
-    pass # Your code
+    all_tokens = set()
+    for doc in documents:
+        all_tokens.update(tokenize(doc))
+    t2i = {token: idx for idx, token in enumerate(all_tokens)}
+    i2t = {idx: token for token, idx in t2i.items()}
+    return t2i, i2t
+
+
 
 # Test
 t2i, i2t = make_vocabulary_map([text])
@@ -174,8 +191,10 @@ all(i2t[t2i[tok]] == tok for tok in t2i) # should be True
 # Your code here:
 # -----------------------------------------------
 def tokenize_and_encode(documents: list) -> list:
-    # Hint: use your make_vocabulary_map and tokenize function
-    pass # Your code
+    t2i, i2t = make_vocabulary_map(documents)
+    enc = [[t2i[token] for token in tokenize(doc)] for doc in documents]
+    return enc, t2i, i2t
+
 
 # Test:
 enc, t2i, i2t = tokenize_and_encode([text, 'What a luck we had today!'])
@@ -201,7 +220,7 @@ enc, t2i, i2t = tokenize_and_encode([text, 'What a luck we had today!'])
 
 # Your code here:
 # -----------------------------------------------
-sigmoid = _ # Your code
+sigmoid = lambda x: 1 / (1 + np.exp(-x))
 
 # Test:
 np.all(sigmoid(np.log([1, 1/3, 1/7])) == np.array([1/2, 1/4, 1/8]))
@@ -310,8 +329,8 @@ o.shape == (100,) and o.mean().round(3) == 16.287 and o.std().astype(int) == 133
 
 # Your code here:
 # -----------------------------------------------
-def rnn_loss(w: np.array, w, list_of_sequences: list[np.array], y: np.array) -> np.float64:
-    pass # Your code
+#def rnn_loss(w: np.array, w, list_of_sequences: list[np.array], y: np.array) -> np.float64:
+  #  pass # Your code
 
 # Test:
 y = np.array([(X @ np.arange(1,4))[0] for X in list_of_sequences])
